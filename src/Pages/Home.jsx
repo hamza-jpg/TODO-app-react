@@ -1,172 +1,110 @@
 import React, { useState } from "react";
+// Parçalanmış bileşenlerimizi (components) içeri aktarıyoruz
+import TodoItem from "../Components/TodoItem";
+import TodoButton from "../Components/TodoButton";
 
 function Home() {
     // --- 1. DURUM YÖNETİMİ (STATE MANAGEMENT) ---
-    
-    // Kullanıcının metin kutusuna girdiği anlık veriyi tutar
     const [taskText, setTaskText] = useState("");
-    
-    // Görev listesini tutan ana state. 
-    // Veri Yapısı: [{ text: "Örnek Görev", isCompleted: false }, ...]
     const [tasks, setTasks] = useState([]); 
-    
-    // Güncelleme operasyonları için geçici hafızalar
-    const [editIndex, setEditIndex] = useState(null); // Şu an hangi satır düzenleniyor (index numarası)
-    const [editText, setEditText] = useState("");     // Düzenlenen metnin anlık değerini tutar
+    const [editIndex, setEditIndex] = useState(null);
+    const [editText, setEditText] = useState("");
 
-    // --- 2. İŞ MANTIĞI VE FONKSİYONLAR (BUSINESS LOGIC) ---
+    // --- 2. İŞ MANTIĞI (BUSINESS LOGIC) ---
 
-    /**
-     * Yeni bir görev ekler (Create)
-     * Kullanıcı boş veri gönderirse işlemi iptal eder.
-     * Mevcut listeyi bozmadan, kopyasının sonuna yeni bir obje ekler.
-     */
+    // Yeni görev ekleme (Create)
     const handleAddTask = () => {
         if (taskText.trim() === "") return;
-        
-        // Spread operator (...) ile mevcut diziyi koruyup yeni elemanı obje olarak ekliyoruz
         setTasks([...tasks, { text: taskText, isCompleted: false }]);
-        setTaskText(""); // İşlem bitince input alanını temizle
+        setTaskText(""); 
     };
 
-    /**
-     * Belirtilen index numarasına sahip görevi listeden siler (Delete)
-     * filter() metodu ile tıklanan eleman dışındaki tüm elemanları içeren yeni bir dizi oluşturur.
-     */
-    const handleDeleteTask = (indexToDelete) => {
-        const updatedTasks = tasks.filter((_, index) => index !== indexToDelete);
-        setTasks(updatedTasks);
+    // Görev silme (Delete)
+    const handleDeleteTask = (index) => {
+        setTasks(tasks.filter((_, i) => i !== index));
     };
 
-    /**
-     * Görevin tamamlanma (isCompleted) durumunu tersine çevirir (Toggle)
-     * Checkbox işaretlendiğinde veya kaldırıldığında çalışır.
-     */
+    // Tamamlanma durumunu değiştirme (Update - Status)
     const handleToggleComplete = (index) => {
-        const updatedTasks = [...tasks];
-        // Mantıksal DEĞİL (!) operatörü ile mevcut durumu tersine çeviriyoruz (true -> false, false -> true)
-        updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
-        setTasks(updatedTasks);
+        const newTasks = [...tasks];
+        newTasks[index].isCompleted = !newTasks[index].isCompleted;
+        setTasks(newTasks);
     };
 
-    /**
-     * Düzenleme modunu başlatır
-     * İlgili satırı input alanına dönüştürmek için gerekli stateleri doldurur.
-     */
-    const handleEditStart = (index, currentText) => {
-        setEditIndex(index);
-        setEditText(currentText);
-    };
-
-    /**
-     * Düzenlenen metni kalıcı olarak kaydeder (Update)
-     * Boş metin kaydedilmesini engeller ve işlemi bitirince düzenleme modunu kapatır.
-     */
+    // Düzenlenen metni kaydetme (Update - Text)
     const handleEditSave = () => {
         if (editText.trim() === "") return;
-        
-        const updatedTasks = [...tasks];
-        updatedTasks[editIndex].text = editText; // Sadece ilgili objenin 'text' değerini güncelliyoruz
-        
-        setTasks(updatedTasks);
-        setEditIndex(null); // Düzenleme modundan çık (input'u tekrar metne dönüştür)
+        const newTasks = [...tasks];
+        newTasks[editIndex].text = editText;
+        setTasks(newTasks);
+        setEditIndex(null);
     };
 
-    // UI'da (Kullanıcı Arayüzü) göstermek üzere tamamlanmış görevlerin sayısını dinamik hesaplar
-    const completedCount = tasks.filter(task => task.isCompleted).length;
+    // İstatistiksel veriler (Computed Properties)
+    const completedCount = tasks.filter(t => t.isCompleted).length;
 
-    // --- 3. KULLANICI ARAYÜZÜ (RENDER / UI) ---
+    // --- 3. KULLANICI ARAYÜZÜ (RENDER) ---
     return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
-      <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-6 font-sans">
+      <div className="bg-white/80 backdrop-blur-md w-full max-w-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
         
-        {/* Üst Bilgi Paneli (Header) */}
-        <div className="bg-indigo-600 p-6 text-white">
-            <h1 className="text-3xl font-bold mb-1">Yapılacaklar</h1>
-            <p className="text-indigo-200 text-sm">
-                {tasks.length} görevden {completedCount} tanesi tamamlandı
+        {/* Header: Uygulama Başlığı ve İstatistikler */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight mb-2">My Tasks</h1>
+            <p className="text-indigo-100 opacity-90">
+                {tasks.length} Total • {completedCount} Done
             </p>
         </div>
 
-        <div className="p-6">
-            
-            {/* Görev Ekleme Form Alanı */}
-            <div className="flex gap-2 mb-6">
+        <div className="p-8">
+            {/* Input Grubu: Yeni görev girişi */}
+            <div className="flex gap-3 mb-8">
                 <input
                     type="text"
                     value={taskText}
                     onChange={(e) => setTaskText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddTask()} // Klavye UX iyileştirmesi
-                    placeholder="Yeni bir görev ekle..."
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+                    placeholder="What needs to be done?"
+                    className="flex-1 bg-gray-50/50 border-2 border-gray-100 rounded-2xl px-5 py-4 focus:outline-none focus:border-indigo-400 focus:bg-white transition-all shadow-inner"
                 />
-                <button
-                    onClick={handleAddTask}
-                    className="bg-indigo-600 text-white px-5 py-3 rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md"
-                >
-                    Ekle
-                </button>
+                <TodoButton onClick={handleAddTask}>Add</TodoButton>
             </div>
 
-            {/* Dinamik Görev Listesi (Read) */}
-            <ul className="space-y-3">
+            {/* Liste: Görevlerin dinamik olarak map edildiği alan */}
+            <ul className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {tasks.map((task, index) => (
-                    // Listedeki her bir eleman. 'group' sınıfı hover efektleri için kullanıldı
-                    <li key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center group hover:border-indigo-100 transition-all">
-                    
-                    {/* Düzenleme Modu Aktifse Çalışacak Görünüm */}
-                    {editIndex === index ? (
-                        <div className="flex gap-2 w-full animate-pulse">
+                    // Eğer düzenleme modundaysak input göster, değilsek TodoItem bileşenini göster
+                    editIndex === index ? (
+                        <div key={index} className="flex gap-2 animate-in fade-in zoom-in duration-200">
                             <input
-                                type="text"
                                 value={editText}
                                 onChange={(e) => setEditText(e.target.value)}
-                                className="flex-1 border-b-2 border-indigo-500 bg-gray-50 px-2 py-1 focus:outline-none text-gray-700"
+                                className="flex-1 border-2 border-green-400 rounded-xl px-4 py-2 outline-none"
                                 autoFocus
                             />
-                            <button onClick={handleEditSave} className="text-indigo-600 hover:text-indigo-800 text-sm font-bold">
-                                Kaydet
-                            </button>
+                            <TodoButton variant="success" onClick={handleEditSave}>Save</TodoButton>
                         </div>
                     ) : (
-                    /* Düzenleme Modu Kapalıysa Çalışacak Standart Görünüm */
-                        <>
-                            <div className="flex items-center gap-3 flex-1 overflow-hidden">
-                                <input 
-                                    type="checkbox" 
-                                    checked={task.isCompleted}
-                                    onChange={() => handleToggleComplete(index)}
-                                    className="w-5 h-5 accent-indigo-600 cursor-pointer"
-                                />
-                                {/* Görev tamamlandıysa CSS ile üstünü çiz ve rengi soluklaştır */}
-                                <span className={`break-all ${task.isCompleted ? 'line-through text-gray-400' : 'text-gray-700 font-medium'}`}>
-                                    {task.text}
-                                </span>
-                            </div>
-
-                            {/* Aksiyon Butonları (Düzenle ve Sil) */}
-                            <div className="flex gap-3 opacity-70 group-hover:opacity-100 transition-opacity ml-4">
-                                <button onClick={() => handleEditStart(index, task.text)} className="text-blue-500 hover:text-blue-700 text-sm font-semibold">
-                                    ✎
-                                </button>
-                                <button onClick={() => handleDeleteTask(index)} className="text-red-500 hover:text-red-700 text-sm font-semibold">
-                                    ✕
-                                </button>
-                            </div>
-                        </>
-                    )}
-                    </li>
+                        <TodoItem 
+                            key={index} 
+                            task={task} 
+                            index={index} 
+                            onToggle={handleToggleComplete} 
+                            onDelete={handleDeleteTask}
+                            onEditStart={(i, txt) => { setEditIndex(i); setEditText(txt); }}
+                        />
+                    )
                 ))}
             </ul>
 
-            {/* Boş Liste Durumu (Empty State) İyileştirmesi */}
+            {/* Empty State: Liste boşsa kullanıcıya gösterilecek alan */}
             {tasks.length === 0 && (
-                <div className="text-center py-8">
-                    <p className="text-gray-400">Harika! Yapılacak hiçbir şey yok.</p>
+                <div className="text-center py-12 opacity-40">
+                    <div className="text-6xl mb-4">📋</div>
+                    <p className="text-xl font-medium">Your list is empty</p>
                 </div>
             )}
         </div>
-
       </div>
     </div>
   );
