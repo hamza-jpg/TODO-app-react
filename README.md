@@ -22,7 +22,7 @@ A user-friendly and fully functional task management application built with mode
 To run this project locally, follow these steps:
 
 1. Clone this repository:
-    git clone [https://github.com/YOUR_USERNAME/todo-app-react.git](https://github.com/YOUR_USERNAME/todo-app-react.git)
+    git clone [https://github.com/YOUR_USERNAME/todo-app-react.git](https://github.com/hamza-jpg/todo-app-react.git)
 
 2. Navigate to the project directory:
     cd todo-app-react
