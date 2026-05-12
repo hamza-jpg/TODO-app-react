@@ -17,6 +17,9 @@ A user-friendly and fully functional task management application built with mode
 - **Build Tool:** Vite
 - **Version Control:** Git & GitHub
 
+## VIEW LIVE DEMO
+- Project has deployed via Vercel, here is the link: https://todo-app-react-olive-pi.vercel.app/
+
 ## Installation & Setup
 
 To run this project locally, follow these steps:
