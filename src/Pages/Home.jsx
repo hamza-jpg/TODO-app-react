@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import TodoItem from "../components/TodoItem";
-import TodoButton from "../components/TodoButton";
+import TodoItem from "../Components/TodoItem";
+import TodoButton from "../Components/TodoButton";
 import { THEME } from "../Interfaces/AppTheme"; // Temayı buraya da ekledik
 
 function Home() {
