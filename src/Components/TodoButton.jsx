@@ -1,17 +1,19 @@
 import React from 'react';
+import { THEME } from '../Interfaces/AppTheme'; // Yeni import
 
 const TodoButton = ({ onClick, children, variant = 'primary' }) => {
-  const styles = {
-    primary: "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md",
-    danger: "text-red-500 hover:text-red-700 font-semibold",
-    success: "text-green-600 hover:text-green-800 font-bold",
-    edit: "text-blue-500 hover:text-blue-700 font-semibold"
+  // Stil tanımlarını merkezi temadan çekiyoruz
+  const variantStyles = {
+    primary: `${THEME.colors.primary} ${THEME.colors.primaryHover} text-white shadow-md`,
+    danger: THEME.colors.danger,
+    success: THEME.colors.success,
+    edit: "text-blue-500 hover:text-blue-700"
   };
 
   return (
     <button 
       onClick={onClick} 
-      className={`${styles[variant]} px-4 py-2 rounded-lg transition-all active:scale-95 duration-200`}
+      className={`${variantStyles[variant]} ${THEME.animation.transition} ${THEME.animation.hoverScale} px-4 py-2 rounded-lg`}
     >
       {children}
     </button>
